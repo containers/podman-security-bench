@@ -1,0 +1,6 @@
+*
+!podman-security.sh
+!functions/
+!tests/
+!log/
+log/*
