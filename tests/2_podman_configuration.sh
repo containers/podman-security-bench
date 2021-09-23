@@ -307,34 +307,6 @@ check_2_17() {
   logcheckresult "INFO"
 }
 
-check_2_18() {
-  podman_version=$(podman version | grep ' Version:' \
-    | awk '{print $NF; exit}' | tr -d '[:alpha:]-,.' | cut -c 1-4)
-
-  local id="2.18"
-  local desc="Ensure that experimental features are not implemented in production (Scored)"
-  local remediation="You should not pass --experimental as a runtime parameter to the Podman service on production systems."
-  local remediationImpact="None."
-  local check="$id - $desc"
-  starttestjson "$id" "$desc"
-
-  echo DAN $podman_version
-  if [ "$podman_version" -le 1903 ]; then
-    if podman version -f '{{.Server.Experimental}}' | grep false 2>/dev/null 1>&2; then
-      pass -s "$check"
-      logcheckresult "PASS"
-      return
-    fi
-    warn -s "$check"
-    logcheckresult "WARN"
-    return
-  fi
-  local desc="$desc (Deprecated)"
-  local check="$id - $desc"
-  info -c "$desc"
-  logcheckresult "INFO"
-}
-
 check_2_end() {
   endsectionjson
 }
