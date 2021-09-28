@@ -15,9 +15,9 @@ this benchmark.
 You can simply run this script from your base host by running:
 
 ```sh
-git clone https://github.com/podman/podman-security-benchmark.git
-cd podman-security-benchmark
-sudo sh podman-security-benchmark.sh
+git clone https://github.com/containers/podman-security-bench.git
+cd podman-security-bench
+sudo sh podman-security-bench.sh
 ```
 
 ### Note
@@ -40,20 +40,20 @@ Note that when distributions don't contain `auditctl`, the audit tests will chec
   -p PRINT     optional  Disable the printing of remediation measures. Default: print remediation measures.
 ```
 
-By default the Podman Security Bench script will run all available CIS tests and produce
-logs in the log folder from current directory, named `podman-security.sh.log.json` and
-`podman-security.sh.log`.
+By default, the Podman Security Bench script will run all available CIS tests and produce
+logs in the log folder from current directory, named `podman-security-bench.log.json` and
+`podman-security-bench.log`.
 
 The CIS based checks are named `check_<section>_<number>`, e.g. `check_2_6` and community contributed checks are named `check_c_<number>`.
 
-`sh podman-security.sh -c check_2_2` will only run check `2.2 Ensure the logging level is set to 'info'`.
+`sh podman-security-bench.sh -c check_2_2` will only run check `2.2 Ensure the logging level is set to 'info'`.
 
-`sh podman-security.sh -e check_2_2` will run all available checks except `2.2 Ensure the logging level is set to 'info'`.
+`sh podman-security-bench.sh -e check_2_2` will run all available checks except `2.2 Ensure the logging level is set to 'info'`.
 
-`sh podman-security.sh -e podman_enterprise_configuration` will run all available checks except the podman_enterprise_configuration group
+`sh podman-security-bench.sh -e podman_enterprise_configuration` will run all available checks except the podman_enterprise_configuration group
 
-`sh podman-security.sh -e podman_enterprise_configuration,check_2_2` will run allavailable checks except the podman_enterprise_configuration group and `2.2 Ensure the logging level is set to 'info'`
+`sh podman-security-bench.sh -e podman_enterprise_configuration,check_2_2` will run all available checks except the podman_enterprise_configuration group and `2.2 Ensure the logging level is set to 'info'`
 
-`sh podman-security.sh -c container_images -e check_4_5` will run just the container_images checks except `4.5 Ensure Content trust for Podman is Enabled`
+`sh podman-security-bench.sh -c container_images -e check_4_5` will run just the container_images checks except `4.5 Ensure Content trust for Podman is Enabled`
 
 Note that when submitting checks, provide information why it is a reasonable test to add and please include some kind of official documentation verifying that information.
