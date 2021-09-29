@@ -60,9 +60,9 @@ Options:
   -n LIMIT     optional  In JSON output, when reporting lists of items (containers, images, etc.), limit the number of reported items to LIMIT. Default 0 (no limit).
   -p PRINT     optional  Print remediation measures. Default: Don't print remediation measures.
 
-Complete list of checks: <https://github.com/podman/podman-bench-security/blob/master/tests/>
-Full documentation: <https://github.com/podman/podman-bench-security>
-Released under the Apache-2.0 License.
+Complete list of checks: <https://github.com/containers/podman-security-bench/tree/main/tests>
+Full documentation: <https://github.com/containers/podman-security-bench#readme>
+Released under the Apache-2.0 License. <https://github.com/containers/podman-security-bench/blob/main/LICENSE.md>
 EOF
 }
 
@@ -95,7 +95,7 @@ do
   esac
 done
 
-# Load output formating
+# Load output formatting
 . ./functions/output_lib.sh
 
 yell_info
@@ -124,7 +124,7 @@ main () {
 
   # If there is a container with label podman_bench_security, memorize it:
   benchcont="nil"
-  for c in $(podman ps | sed '1d' | awk '{print $NF}'); do
+  for c in $(podman ps --quiet); do
     if podman inspect --format '{{ .Config.Labels }}' "$c" | \
      grep -e 'podman.bench.security' >/dev/null 2>&1; then
       benchcont="$c"
@@ -133,7 +133,7 @@ main () {
 
   # Get the image id of the podman_bench_security_image, memorize it:
   benchimagecont="nil"
-  for c in $(podman images | sed '1d' | awk '{print $3}'); do
+  for c in $(podman images --quiet); do
     if podman inspect --format '{{ .Config.Labels }}' "$c" | \
      grep -e 'podman.bench.security' >/dev/null 2>&1; then
       benchimagecont="$c"
@@ -142,15 +142,15 @@ main () {
 
   if [ -n "$include" ]; then
     pattern=$(echo "$include" | sed 's/,/|/g')
-    containers=$(podman ps | sed '1d' | awk '{print $NF}' | grep -v "$benchcont" | grep -E "$pattern")
-    images=$(podman images | sed '1d' | grep -E "$pattern" | awk '{print $3}' | grep -v "$benchimagecont")
+    containers=$(podman ps --quiet | grep -v "$benchcont" | grep -E "$pattern")
+    images=$(podman images --noheading | grep -E "$pattern" | awk '{print $3}' | grep -v "$benchimagecont")
   elif [ -n "$exclude" ]; then
     pattern=$(echo "$exclude" | sed 's/,/|/g')
-    containers=$(podman ps | sed '1d' | awk '{print $NF}' | grep -v "$benchcont" | grep -Ev "$pattern")
-    images=$(podman images | sed '1d' | grep -Ev "$pattern" | awk '{print $3}' | grep -v "$benchimagecont")
+    containers=$(podman ps --quiet | grep -v "$benchcont" | grep -Ev "$pattern")
+    images=$(podman images --noheading | grep -Ev "$pattern" | awk '{print $3}' | grep -v "$benchimagecont")
   else
-    containers=$(podman ps | sed '1d' | awk '{print $NF}' | grep -v "$benchcont")
-    images=$(podman images -q | grep -v "$benchcont")
+    containers=$(podman ps --quiet | grep -v "$benchcont")
+    images=$(podman images --quiet | grep -v "$benchimagecont")
   fi
 
   for test in tests/*.sh; do
