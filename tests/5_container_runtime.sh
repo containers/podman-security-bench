@@ -203,10 +203,8 @@ check_5_5() {
   fail=0
   sensitive_mount_containers=""
   for c in $containers; do
-    volumes=$(podman inspect --format '{{ .Mounts }}' "$c")
-    if podman inspect --format '{{ .VolumesRW }}' "$c" 2>/dev/null 1>&2; then
-      volumes=$(podman inspect --format '{{ .VolumesRW }}' "$c")
-    fi
+    volumes=$(podman inspect --format '{{ .VolumesRW }}' "$c")
+    [ -z "$volumes" ] && volumes=$(podman inspect --format '{{ .Mounts }}' "$c")
     # Go over each directory in sensitive dir and see if they exist in the volumes
     for v in $sensitive_dirs; do
       sensitive=0
