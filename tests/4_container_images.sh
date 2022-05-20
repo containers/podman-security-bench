@@ -104,7 +104,7 @@ check_4_6() {
   fail=0
   no_health_images=""
   for img in $images; do
-    if podman inspect --format='{{.Config.Healthcheck}}' "$img" 2>/dev/null | grep -e "<nil>" >/dev/null 2>&1; then
+    if podman inspect --format='{{.HealthCheck.Test}}' "$img" 2>/dev/null | grep -e "NONE" >/dev/null 2>&1; then
       if [ $fail -eq 0 ]; then
         fail=1
         warn -s "$check"
