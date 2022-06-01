@@ -166,8 +166,34 @@ check_4_8() {
   local check="$id - $desc"
   starttestjson "$id" "$desc"
 
-  note -c "$check"
-  logcheckresult "NOTE"
+  #TODO errorhandling if whitelist file not available
+
+  fail=0
+  id_containers=""
+  for c in $containers; do
+    mapfile -t containerFiles < <(podman export "$c" | tar -tv 2>/dev/null | grep -E '^[-rwx].*(s|S).*\s[0-9]' | awk '{print $6}')
+    for file in "${containerFiles[@]}"; do
+      non_wl_found="0"
+      if ! grep -q "${file}" "whitelists/wl_${id}" 2>/dev/null; then
+        non_wl_found=$file
+      fi
+    done
+    if [ "$non_wl_found" != "0" ]; then
+      if [ $fail -eq 0 ]; then
+        fail=1
+        info -c "$check"
+      fi
+      warn "      * None whitelisted file found: $c"
+      id_containers="$id_containers $c/$non_wl_found"
+    fi
+  done
+
+  if [ $fail -eq 0 ]; then
+    pass -c "$check"
+    logcheckresult "PASS"
+    return
+  fi
+  logcheckresult "WARN" "None whitelisted files found" "$id_containers"
 }
 
 check_4_9() {
