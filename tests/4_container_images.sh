@@ -160,13 +160,17 @@ check_4_7() {
 
 check_4_8() {
   local id="4.8"
-  local desc="Ensure setuid and setgid permissions are removed (Manual)"
+  local desc="Ensure setuid and setgid permissions are removed"
   local remediation="You should allow setuid and setgid permissions only on executables which require them. You could remove these permissions at build time by adding the following command in your Containerfile, preferably towards the end of the Containerfile: RUN find / -perm /6000 -type f -exec chmod a-s {} ; || true"
   local remediationImpact="The above command would break all executables that depend on setuid or setgid permissions including legitimate ones. You should therefore be careful to modify the command to suit your requirements so that it does not reduce the permissions of legitimate programs excessively. Because of this, you should exercise a degree of caution and examine all processes carefully before making this type of modification in order to avoid outages."
   local check="$id - $desc"
-  starttestjson "$id" "$desc"
+  local wl_file="${WL_PATH}/wl_check_${id}"
+  [ ! -r "${wl_file}" ] && {
+    logit "ERROR: Whitelist file '$wl_file' not found or not readable!"
+    return
+  }
 
-  #TODO errorhandling if whitelist file not available
+  starttestjson "$id" "$desc"
 
   fail=0
   id_containers=""
@@ -174,7 +178,7 @@ check_4_8() {
     mapfile -t containerFiles < <(podman export "$c" | tar -tv 2>/dev/null | grep -E '^[-rwx].*(s|S).*\s[0-9]' | awk '{print $6}')
     for file in "${containerFiles[@]}"; do
       non_wl_found="0"
-      if ! grep -q "${file}" "whitelists/wl_${id}" 2>/dev/null; then
+      if ! grep -q "${file}" "${wl_file}" 2>/dev/null; then
         non_wl_found=$file
       fi
     done
