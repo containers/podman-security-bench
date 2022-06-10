@@ -355,12 +355,10 @@ check_5_8() {
     rawPorts=$(podman inspect "$c" --format '{{ .NetworkSettings.Ports }}')
     for rawport in ${rawPorts}; do
       non_wl_found="0"
-      set -x
       # shellcheck disable=SC2001
       if ! grep -q "$(echo "$rawport" | sed 's/[^[:digit:]]*//g')" "${wl_file}" 2>/dev/null; then
         non_wl_found=$rawport
       fi
-      set +x
       if [ "$non_wl_found" != "0" ]; then
         if [ $fail -eq 0 ]; then
           fail=1
