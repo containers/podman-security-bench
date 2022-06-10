@@ -160,7 +160,7 @@ check_4_7() {
 
 check_4_8() {
   local id="4.8"
-  local desc="Ensure setuid and setgid permissions are removed"
+  local desc="Ensure setuid and setgid permissions are removed (Whitelist)"
   local remediation="You should allow setuid and setgid permissions only on executables which require them. You could remove these permissions at build time by adding the following command in your Containerfile, preferably towards the end of the Containerfile: RUN find / -perm /6000 -type f -exec chmod a-s {} ; || true"
   local remediationImpact="The above command would break all executables that depend on setuid or setgid permissions including legitimate ones. You should therefore be careful to modify the command to suit your requirements so that it does not reduce the permissions of legitimate programs excessively. Because of this, you should exercise a degree of caution and examine all processes carefully before making this type of modification in order to avoid outages."
   local check="$id - $desc"
