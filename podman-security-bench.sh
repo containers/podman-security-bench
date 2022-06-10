@@ -106,7 +106,7 @@ export WL_PATH="$wl_path"
 . ./functions/output_lib.sh
 
 yell_info
-yell "Whitelist path set to: $WL_PATH"
+yell "Whitelist path set to: $(realpath "$WL_PATH")"
 
 # Warn if not root
 if [ "$(id -u)" != "0" ]; then
