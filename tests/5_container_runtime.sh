@@ -351,13 +351,13 @@ check_5_8() {
   fail=0
   id_containers=""
   for c in $containers; do
-    # mapfile -t rawPorts < <(podman inspect "$c" --format '{{ .NetworkSettings.Ports }}')
     rawPorts=$(podman inspect "$c" --format '{{ .NetworkSettings.Ports }}')
     for rawport in ${rawPorts}; do
       non_wl_found="0"
       # shellcheck disable=SC2001
-      if ! grep -q "$(echo "$rawport" | sed 's/[^[:digit:]]*//g')" "${wl_file}" 2>/dev/null; then
-        non_wl_found=$rawport
+      port="$(echo "$rawport" | sed 's/[^[:digit:]]*//g')"
+      if ! grep -q "${port}" "${wl_file}" 2>/dev/null; then
+        non_wl_found=$port
       fi
       if [ "$non_wl_found" != "0" ]; then
         if [ $fail -eq 0 ]; then
