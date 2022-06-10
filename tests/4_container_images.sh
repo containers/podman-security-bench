@@ -181,15 +181,15 @@ check_4_8() {
       if ! grep -q "${file}" "${wl_file}" 2>/dev/null; then
         non_wl_found=$file
       fi
-    done
-    if [ "$non_wl_found" != "0" ]; then
-      if [ $fail -eq 0 ]; then
-        fail=1
-        info -c "$check"
+      if [ "$non_wl_found" != "0" ]; then
+        if [ $fail -eq 0 ]; then
+          fail=1
+          info -c "$check"
+        fi
+        warn "      * None whitelisted file found: $c"
+        id_containers="$id_containers $c/$non_wl_found"
       fi
-      warn "      * None whitelisted file found: $c"
-      id_containers="$id_containers $c/$non_wl_found"
-    fi
+    done
   done
 
   if [ $fail -eq 0 ]; then
