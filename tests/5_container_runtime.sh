@@ -336,14 +336,48 @@ check_5_8() {
   fi
 
   local id="5.8"
-  local desc="Ensure that only needed ports are open on the container (Manual)"
+  local desc="Ensure that only needed ports are open on the container (Whitelist)"
   local remediation="You should ensure that the Podmanfile for each container image only exposes needed ports."
   local remediationImpact="None."
   local check="$id - $desc"
+  local wl_file="${WL_PATH}/wl_check_${id}"
+  [ ! -r "${wl_file}" ] && {
+    logit "ERROR: Whitelist file '$wl_file' not found or not readable!"
+    return
+  }
+
   starttestjson "$id" "$desc"
 
-  note -c "$check"
-  logcheckresult "NOTE"
+  fail=0
+  id_containers=""
+  for c in $containers; do
+    # mapfile -t rawPorts < <(podman inspect "$c" --format '{{ .NetworkSettings.Ports }}')
+    rawPorts=$(podman inspect "$c" --format '{{ .NetworkSettings.Ports }}')
+    for rawport in ${rawPorts}; do
+      non_wl_found="0"
+      set -x
+      # shellcheck disable=SC2001
+      if ! grep -q "$(echo "$rawport" | sed 's/[^[:digit:]]*//g')" "${wl_file}" 2>/dev/null; then
+        non_wl_found=$rawport
+      fi
+      set +x
+      if [ "$non_wl_found" != "0" ]; then
+        if [ $fail -eq 0 ]; then
+          fail=1
+          info -c "$check"
+        fi
+        warn "      * None whitelisted port found: $c"
+        id_containers="$id_containers $c/$non_wl_found"
+      fi
+    done
+  done
+
+  if [ $fail -eq 0 ]; then
+    pass -c "$check"
+    logcheckresult "PASS"
+    return
+  fi
+  logcheckresult "WARN" "None whitelisted ports found" "$id_containers"
 }
 
 check_5_9() {
