@@ -38,7 +38,7 @@ Note that when distributions don't contain `auditctl`, the audit tests will chec
   -x EXCLUDE   optional  Comma delimited list of patterns within a container or image name to exclude from check
   -n LIMIT     optional  In JSON output, when reporting lists of items (containers, images, etc.), limit the number of reported items to LIMIT. Default 0 (no limit).
   -p PRINT     optional  Disable the printing of remediation measures. Default: print remediation measures.
-  -w PATH      optional  Path to directory containing whitelist files.
+  -w PATH      optional  Path to directory containing files with allowed content.
 ```
 
 By default, the Podman Security Bench script will run all available CIS tests and produce
@@ -59,16 +59,23 @@ The CIS based checks are named `check_<section>_<number>`, e.g. `check_2_6` and 
 
 Note that when submitting checks, provide information why it is a reasonable test to add and please include some kind of official documentation verifying that information.
 
-### Whitelist Checks
+### Allowed Content
 
-Some of the checks require a whitelist in order to verify content or configuration of a container.
-For example check\_4\_8 (Ensure setuid and setgid permissions are removed) contains a whitelist file
+Some of the checks require an allow file in order to verify content or configuration of a container.
+For example check\_4\_8 (Ensure setuid and setgid permissions are removed) uses a file
 containing all the files which are allowed to have setuid or setgid set.
 
-There is a default whitelist for every affected check below directory `whitelists`. Most likely
-these defaults will not suit the requirements for your particular containers. In this case just
-provide your own whitelists with something like `-w path/to/your/whitelists`, which must point to a
+There is a default file for every affected check below directory `default-lists`.
+They must follow a simple naming pattern:
+
+* `allow_check_x.y`
+
+
+Most likely
+these defaults will not suit the requirements for your particular containers. That's why it is
+*highly advisable* to provide your own files at runtime.
+To do so just provide your files with something like `-w path/to/your/files`, which must point to a
 directory containing all required files.
 
-Beware if a required whitelist cannot be found, an error message is issued and the test will not be
+Beware if a required file cannot be found, an error message is issued and the test will not be
 executed.
