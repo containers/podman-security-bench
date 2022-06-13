@@ -38,6 +38,7 @@ Note that when distributions don't contain `auditctl`, the audit tests will chec
   -x EXCLUDE   optional  Comma delimited list of patterns within a container or image name to exclude from check
   -n LIMIT     optional  In JSON output, when reporting lists of items (containers, images, etc.), limit the number of reported items to LIMIT. Default 0 (no limit).
   -p PRINT     optional  Disable the printing of remediation measures. Default: print remediation measures.
+  -w PATH      optional  Path to directory containing whitelist files.
 ```
 
 By default, the Podman Security Bench script will run all available CIS tests and produce
@@ -57,3 +58,17 @@ The CIS based checks are named `check_<section>_<number>`, e.g. `check_2_6` and 
 `sh podman-security-bench.sh -c container_images -e check_4_5` will run just the container_images checks except `4.5 Ensure Content trust for Podman is Enabled`
 
 Note that when submitting checks, provide information why it is a reasonable test to add and please include some kind of official documentation verifying that information.
+
+### Whitelist Checks
+
+Some of the checks require a whitelist in order to verify content or configuration of a container.
+For example check\_4\_8 (Ensure setuid and setgid permissions are removed) contains a whitelist file
+containing all the files which are allowed to have setuid or setgid set.
+
+There is a default whitelist for every affected check below directory `whitelists`. Most likely
+these defaults will not suit the requirements for your particular containers. In this case just
+provide your own whitelists with something like `-w path/to/your/whitelists`, which must point to a
+directory containing all required files.
+
+Beware if a required whitelist cannot be found, an error message is issued and the test will not be
+executed.
