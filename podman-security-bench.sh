@@ -18,8 +18,8 @@ version='1.0.0'
 this_path=$(abspath "$0")       ## Path of this file including filename
 myname=$(basename "${this_path%.*}")     ## file name of this script.
 
-# default path to whitelist files
-wl_path=whitelists
+# default path to allow files
+lists_path=default-lists
 
 readonly version
 readonly this_path
@@ -62,7 +62,7 @@ Options:
   -x EXCLUDE   optional  Comma delimited list of patterns within a container or image name to exclude from check
   -n LIMIT     optional  In JSON output, when reporting lists of items (containers, images, etc.), limit the number of reported items to LIMIT. Default 0 (no limit).
   -p PRINT     optional  Print remediation measures. Default: Don't print remediation measures.
-  -w PATH      optional  Path to directory containing whitelist files.
+  -w PATH      optional  Path to directory containing files with allowed content.
 
 Complete list of checks: <https://github.com/containers/podman-security-bench/tree/main/tests>
 Full documentation: <https://github.com/containers/podman-security-bench#readme>
@@ -95,18 +95,18 @@ do
   x) exclude="$OPTARG" ;;
   n) limit="$OPTARG" ;;
   p) printremediation="1" ;;
-  w) wl_path="$OPTARG" ;;
+  w) lists_path="$OPTARG" ;;
   *) usage; exit 1 ;;
   esac
 done
 
-export WL_PATH="$wl_path"
+export LISTS_PATH="$lists_path"
 
 # Load output formatting
 . ./functions/output_lib.sh
 
 yell_info
-yell "Whitelist path set to: $(realpath "$WL_PATH")"
+yell "Path to allow files set to: $(realpath "$LISTS_PATH")"
 
 # Warn if not root
 if [ "$(id -u)" != "0" ]; then
