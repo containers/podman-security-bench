@@ -149,3 +149,33 @@ yell "# ------------------------------------------------------------------------
 # Based on the CIS Docker Benchmark 1.3.1.
 # --------------------------------------------------------------------------------------------"
 }
+
+# retrieve command for package manager
+get_list_cmd() {
+  distro="${1}"
+
+  case "$distro" in
+    fedora|rhel|rocky)
+      echo -n "rpm -qa"
+      return
+      ;;
+    debian|ubuntu)
+      echo -n "apt list --installed"
+      return
+      ;;
+    alpine)
+      echo -n "apk info"
+      return
+      ;;
+    centos)
+      echo -n "yum list --installed"
+      return
+      ;;
+    *)
+      echo -n "rpm -qa"
+      return
+      ;;
+  esac
+}
+
+
