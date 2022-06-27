@@ -79,3 +79,49 @@ directory containing all required files.
 
 Beware if a required file cannot be found, an error message is issued and the test will not be
 executed.
+
+The next three chapters provide some advice of how to analyze containers an allow script has to be
+created for.
+
+#### Analyzing Packages in a Container (4.3)
+
+Example:
+```
+$ podman exec 540d7db05f99 apk list
+libretls-3.3.4-r3 x86_64 {libretls} (ISC AND (BSD-3-Clause OR MIT)) [installed]
+musl-1.2.2-r7 x86_64 {musl} (MIT) [installed]
+bash-5.1.16-r0 x86_64 {bash} (GPL-3.0-or-later) [installed]
+java-cacerts-1.0-r1 x86_64 {java-cacerts} (MIT) [installed]
+...
+```
+Or use the respective package manager command when not using alpine.
+Now don't take over complete lines into your file for packages. Simply use the base name of a
+package. E.g. to exclude package `bash-5.1.16-r0` from the allowed packages, simply put `bash` into
+one line of your file.
+
+#### Analyzing setuid and setgid in a Container (4.8)
+
+Example:
+```
+$ podman export 540d7db05f99 | tar -tv 2>/dev/null | grep -E '^[-rwx].*(s|S).*\s[0-9]' | awk '{print $6}'
+etc/shadow
+```
+This will provide all files having setuid or setgid set. They may server as a basis for your
+file. It's up to you to decide.
+
+#### Analyzing configured Ports in a Container (5.8)
+
+Example:
+```
+$ podman inspect c2afbaf5b3 --format '{{ .NetworkSettings.Ports }}'
+map[4711/tcp:[] 8080/tcp:[]]
+```
+
+This will show you a map containing all configured ports. If it's OK to have them configured, simply
+put
+
+```
+4711
+8080
+```
+into your file.
