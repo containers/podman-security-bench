@@ -1042,17 +1042,10 @@ check_5_27() {
   fail=0
   newer_images=""
   for img in $images; do
-    imgTag=$(podman inspect "$img" --format '{{ index .RepoTags 0 }}' | tr -d '[]' | cut -f 2 -d ':')
-
-    # Bad:
-    # * hard coded command
-    # * How to reliably retrieve the repository's name?
-    # * How to configure region?
-    latestTag=$(
-      aws ecr describe-images --repository-name "mycompany/openjdk11-base" --filter tagStatus=TAGGED \
-        --region eu-central-1 --query 'sort_by(imageDetails, &imagePushedAt)[-1].imageTags[]' \
-        | jq '.[] | select(. != "latest")'
-      )
+    imgFullName=$(podman inspect "$img" --format '{{ index .RepoTags 0 }}' | tr -d '[]')
+    imgTag=$(echo "${imgFullName}" | cut -f 2 -d ':')
+    imgUrl="docker://$(echo "${imgFullName}" | cut -f 1 -d ':')"
+    latestTag=$(skopeo list-tags "${imgUrl}" | jq -r '[.Tags[] | select(. != "latest")] | max')
 
     if [ "$imgTag" != "latest" ] && [ "$imgTag" != "$latestTag" ]; then
       if [ $fail -eq 0 ]; then
