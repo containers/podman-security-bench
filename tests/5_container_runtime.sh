@@ -1032,18 +1032,40 @@ check_5_26() {
 }
 
 check_5_27() {
-  if [ -z "$containers" ]; then
-    return
-  fi
-
   local id="5.27"
-  local desc="Ensure that Podman commands always make use of the latest version of their image (Manual)"
+  local desc="Ensure that Podman commands always make use of the latest version of their image (Automatic)"
   local remediation="You should use proper version pinning mechanisms (the <latest> tag which is assigned by default is still vulnerable to caching attacks) to avoid extracting cached older versions. Version pinning mechanisms should be used for base images, packages, and entire images. You can customize version pinning rules according to your requirements."
   local remediationImpact="None."
   local check="$id - $desc"
   starttestjson "$id" "$desc"
 
-  info -c "$check"
+  fail=0
+  newer_images=""
+  for img in $images; do
+    imgFullName=$(podman inspect "$img" --format '{{ index .RepoTags 0 }}' | tr -d '[]')
+    imgTag=$(echo "${imgFullName}" | cut -f 2 -d ':')
+    imgUrl="docker://$(echo "${imgFullName}" | cut -f 1 -d ':')"
+    latestTag=$(skopeo list-tags "${imgUrl}" | jq -r '[.Tags[] | select(. != "latest")] | max')
+
+    if [ "$imgTag" != "latest" ] && [ "$imgTag" != "$latestTag" ]; then
+      if [ $fail -eq 0 ]; then
+        fail=1
+        warn -s "$check"
+        warn "     * Newer image found: $img"
+        newer_images="$newer_images $img"
+        continue
+      fi
+
+      warn "     * Newer image found: $img"
+      newer_images="$newer_images $img"
+    fi
+  done
+  if [ $fail -eq 0 ]; then
+    pass -s "$check"
+    logcheckresult "PASS"
+    return
+  fi
+
   logcheckresult "INFO"
 }
 
