@@ -28,7 +28,7 @@ readonly myname
 export PATH="$PATH:/bin:/sbin:/usr/bin:/usr/local/bin:/usr/sbin/"
 
 # Check for required program(s)
-req_programs 'awk podman grep stat tee tail wc xargs truncate sed'
+req_programs 'awk podman grep stat tee tail wc xargs truncate sed skopeo jq'
 
 # Ensure podman works
 if ! podman ps -q >/dev/null 2>&1; then
