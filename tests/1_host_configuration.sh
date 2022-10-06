@@ -258,7 +258,7 @@ check_1_1_14() {
 }
 
 check_1_1_17() {
-  local id="1.1.18"
+  local id="1.1.17"
   local desc="Ensure auditing is configured for Podman files and directories - /usr/bin/crun (Automated)"
   local remediation="Install auditd. Add -w /usr/bin/crun -k podman to the /etc/audit/rules.d/audit.rules file. Then restart the audit daemon using command service auditd restart."
   local remediationImpact="Audit can generate large log files. So you need to make sure that they are rotated and archived periodically. Create a separate partition for audit logs to avoid filling up other critical partitions."
