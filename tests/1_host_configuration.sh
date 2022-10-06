@@ -235,7 +235,7 @@ check_1_1_11() {
 
 check_1_1_12() {
   local id="1.1.12"
-  local desc="1.1.12 Ensure auditing is configured for Podmanfiles and directories - /etc/containers/storage.conf (Automated)"
+  local desc="Ensure auditing is configured for Podman files and directories - /etc/containers/storage.conf (Automated)"
   local remediation="Install auditd. Add -w /etc/containers/storage.conf -k podman to the /etc/audit/rules.d/audit.rules file. Then restart the audit daemon using command service auditd restart."
   local remediationImpact="Audit can generate large log files. So you need to make sure that they are rotated and archived periodically. Create a separate partition for audit logs to avoid filling up other critical partitions."
   local check="$id - $desc"
