@@ -213,7 +213,7 @@ check_4_8() {
   fail=0
   id_containers=""
   for c in $containers; do
-    mapfile -t containerFiles < <(podman export "$c" | tar -tv 2>/dev/null | grep -E '^[-rwx].*(s|S).*\s[0-9]' | awk '{print $6}')
+    mapfile -t containerFiles < <(podman export "$c" | tar -tv 2>/dev/null | awk '/^[-rwx]+[sS]/ {print $6}')
     for file in "${containerFiles[@]}"; do
       not_allowed_found="0"
       if ! grep -q "${file}" "${allowed_file}" 2>/dev/null; then
