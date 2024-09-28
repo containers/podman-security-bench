@@ -17,7 +17,7 @@ You can simply run this script from your base host by running:
 ```sh
 git clone https://github.com/containers/podman-security-bench.git
 cd podman-security-bench
-sudo sh podman-security-bench.sh
+sudo bash podman-security-bench.sh
 ```
 
 ### Note

@@ -27,7 +27,7 @@ Or you can simply run the shell script locally:
 ```sh
 git clone git@github.com:containers/podman-security.git
 cd podman-security
-sudo sh podman-security.sh
+sudo bash podman-security.sh
 ```
 
 The Podman Security Bench has the main script called `podman-security.sh`.
