@@ -46,11 +46,11 @@ Usage: ${myname}.sh [OPTIONS]
 
 Example:
   - Only run check "2.2 - Ensure the logging level is set to 'info'":
-      sh podman-bench-security.sh -c check_2_2
+      bash podman-bench-security.sh -c check_2_2
   - Run all available checks except the host_configuration group and "2.8 - Enable user namespace support":
-      sh podman-bench-security.sh -e host_configuration,check_2_8
+      bash podman-bench-security.sh -e host_configuration,check_2_8
   - Run just the container_images checks except "4.5 - Ensure Content trust for Podman is Enabled":
-      sh podman-bench-security.sh -c container_images -e check_4_5
+      bash podman-bench-security.sh -c container_images -e check_4_5
 
 Options:
   -b           optional  Do not print colors
