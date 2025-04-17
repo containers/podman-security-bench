@@ -107,6 +107,13 @@ check_5_3() {
   local remediation="You could remove all the currently configured capabilities and then restore only the ones you specifically use: podman run --cap-drop=all --cap-add={<Capability 1>,<Capability 2>} <Run arguments> <Container Image Name or ID> <Command>"
   local remediationImpact="Restrictions on processes within a container are based on which Linux capabilities are in force. Removal of the NET_RAW capability prevents the container from creating raw sockets which is good security practice under most circumstances, but may affect some networking utilities."
   local check="$id - $desc"
+  local allowed_file="${LISTS_PATH}/allow_check_${id}"
+  [ ! -r "${allowed_file}" ] && {
+    logit "ERROR: File '$allowed_file' not found or not readable!"
+    return
+  }
+  local allowed_caps=$(paste -sd'|' "${allowed_file}")
+
   starttestjson "$id" "$desc"
 
   fail=0
@@ -115,7 +122,7 @@ check_5_3() {
     container_caps=$(podman inspect --format 'CapAdd={{ .HostConfig.CapAdd}}' "$c")
     caps=$(echo "$container_caps" | tr "[:lower:]" "[:upper:]" | \
       sed 's/CAPADD/CapAdd/' | \
-      sed -r "s/AUDIT_WRITE|CHOWN|DAC_OVERRIDE|FOWNER|FSETID|KILL|MKNOD|NET_BIND_SERVICE|NET_RAW|SETFCAP|SETGID|SETPCAP|SETUID|SYS_CHROOT|\s//g")
+      sed -r "s/(CAP_)?(${allowed_caps})\s?//g")
 
     if [ "$caps" != 'CapAdd=' ] && [ "$caps" != 'CapAdd=[]' ] && [ "$caps" != 'CapAdd=<no value>' ] && [ "$caps" != 'CapAdd=<nil>' ]; then
       # If it's the first container, fail the test
